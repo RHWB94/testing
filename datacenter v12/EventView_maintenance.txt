@@ -1,0 +1,144 @@
+
+EventView 維護說明（純文字版）
+
+一、分頁目的
+EventView 用於檢視單一活動的回覆狀況。具體包括：
+- 受邀名單（依 Config allowedClasses/allowedStudents 過濾）
+- 已回覆名單
+- 未回覆名單
+- 活動統計數字（總人數/已回覆/未回覆/回覆率）
+
+二、動態欄位說明
+1. B1（活動編號）：下拉選單，選擇欲查看的活動 eventId。
+2. B2（活動名稱）：顯示該 eventId 對應的活動標題。
+
+三、Config 對應欄位
+使用 INDEX/MATCH 依據 B1 取得該活動的設定。
+- K2：allowedClasses
+- L2：allowedStudents
+
+公式：
+K2:
+=IFERROR(INDEX(Config!K:K, MATCH($B$1, Config!A:A, 0)), "")
+L2:
+=IFERROR(INDEX(Config!L:L, MATCH($B$1, Config!A:A, 0)), "")
+
+四、清單展開
+allowedClasses/allowedStudents 必須拆解成可比對的清單，分別置於：
+- M2:M（allowedClasses 展開）
+- N2:N（allowedStudents 展開）
+
+五、受邀名單（H12:I）
+此區為「受邀學生名單」，只顯示 enabled 且被 allowedClasses/allowedStudents 條件包含的人。
+
+公式（H12）：
+=FILTER(
+  {Roster!A2:A, Roster!B2:B},
+  (Roster!D2:D <> "false") *
+  IF(
+    AND($K$2 = "", $L$2 = ""),
+    TRUE,
+    (
+      IF(
+        $K$2 = "",
+        0,
+        ISNUMBER(MATCH(Roster!A2:A, $M$2:$M, 0))
+      )
+      +
+      IF(
+        $L$2 = "",
+        0,
+        ISNUMBER(MATCH(Roster!A2:A & "-" & Roster!B2:B, $N$2:$N, 0))
+      )
+    )
+  )
+)
+
+六、已回覆 key（J6 起）
+此區為本活動「受邀且有回覆」的 key 列表。
+key = class-name，用於比對回覆資料。
+
+公式（J6）：
+=IFERROR(
+  UNIQUE(
+    FILTER(
+      Latest!C2:C & "-" & Latest!D2:D,
+      Latest!A2:A = $B$1,
+      ISNUMBER(
+        MATCH(
+          Latest!C2:C & "-" & Latest!D2:D,
+          $H$12:$H$500 & "-" & $I$12:$I$500,
+          0
+        )
+      )
+    )
+  ),
+  ""
+)
+
+七、已回覆名單（A12:F）
+顯示「受邀且有回覆」的完整回覆資料。
+
+公式（A12）：
+=IFERROR(
+  FILTER(
+    Latest!A2:F,
+    Latest!A2:A = $B$1,
+    ISNUMBER(
+      MATCH(
+        Latest!C2:C & "-" & Latest!D2:D,
+        $J$6:$J$500,
+        0
+      )
+    )
+  ),
+  ""
+)
+
+八、未回覆名單（K12:L）
+來自：受邀名單 - 已回覆名單。
+
+公式（K12）：
+=FILTER(
+  $H$12:$I$500,
+  NOT(
+    ISNUMBER(
+      MATCH(
+        $H$12:$H$500 & "-" & $I$12:$I$500,
+        $J$6:$J$500,
+        0
+      )
+    )
+  )
+)
+
+九、統計數字（B5~B8）
+所有數字皆以「受邀名單」為母體。
+
+B5（總人數）：
+=IF(COUNTA($H$12:$H$500)=0,"",COUNTA($H$12:$H$500))
+
+B6（已回覆）：
+=IFERROR(ROWS(FILTER($J$6:$J$500, $J$6:$J$500 <> "")), 0)
+
+B7（未回覆）：
+=IF(B5="","",B5-B6)
+
+B8（回覆率）：
+=IF(B5=0,"",B6/B5)
+
+十、維護注意事項
+1. 若某活動未設定 allowedClasses/allowedStudents → 視為全員受邀。
+2. repliedKeys（J6）不得放在未回覆名單的上方，以免產生迴圈依賴。
+3. 若 Latest 無任何回覆，J6 與 A12 起應保持空白，不得產生 #N/A。
+4. 若在 Config 更新 allowedClasses/allowedStudents，EventView 會自動重新計算。
+5. 請避免在 M2/N2/H12/J6 等位置手動輸入任何內容，否則會破壞自動計算。
+
+十一、功能概念總結
+- 受邀名單（H12:I）→ 由 allowedClasses/allowedStudents 過濾 Roster 得出。
+- 已回覆 key（J6:J）→ 受邀名單 ∩ Latest。
+- 已回覆名單（A12:F）→ 用 key 換出完整回覆資料。
+- 未回覆名單（K12:L）→ 受邀名單 - 已回覆。
+- 統計（B5~B8）→ B5(受邀) / B6(已回覆) / B7(未回覆)/ B8(回覆率)。
+
+此檔案為純文字說明，可直接用於日後維護 EventView 功能。
