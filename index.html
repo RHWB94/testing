@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>仁和管樂回條系統 - 學生端</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>仁和管樂回條系統</h1>
+    <p class="subtitle">學生登入・活動回條</p>
+  </header>
+
+  <main class="app-main">
+    <section id="login-section" class="card">
+      <h2>學生登入</h2>
+      <form id="login-form" class="form" autocomplete="off">
+        <!-- 隱藏假密碼欄，降低瀏覽器自動填寫真正 PIN 欄位的機率 -->
+        <input
+          type="password"
+          style="position:absolute; left:-9999px; top:-9999px;"
+          tabindex="-1"
+          aria-hidden="true"
+        />
+
+        <label class="form-label">
+          班級
+          <select name="class" id="class-select" required>
+            <option value="">載入中…</option>
+          </select>
+        </label>
+        <label class="form-label">
+          姓名
+          <select name="name" id="name-select" required disabled>
+            <option value="">請先選擇班級</option>
+          </select>
+        </label>
+        <label class="form-label">
+          密碼（5 碼）
+          <input
+            type="password"
+            name="pin"
+            minlength="5"
+            maxlength="5"
+            inputmode="numeric"
+            required
+            autocomplete="new-password"
+          />
+        </label>
+        <button type="submit" class="btn primary full-width">登入</button>
+      </form>
+      <p id="login-error" class="error-text hidden"></p>
+    </section>
+
+    <section id="student-section" class="hidden">
+      <div class="card">
+        <div class="student-info">
+          <div>
+            <div class="student-name" id="student-name"></div>
+            <div class="student-class" id="student-class"></div>
+          </div>
+          <button id="logout-btn" class="btn secondary small">登出</button>
+        </div>
+      </div>
+
+      <section id="events-section" class="card">
+        <h2>目前開放中的活動</h2>
+        <div id="events-list" class="events-list"></div>
+        <p id="events-empty" class="muted hidden">目前沒有開放中的活動。</p>
+      </section>
+
+      <section id="event-detail-section" class="card hidden">
+        <button id="back-to-events-btn" class="btn link">&larr; 返回活動列表</button>
+        <h2 id="event-title"></h2>
+        <p class="event-meta" id="event-meta"></p>
+        <p class="event-desc" id="event-desc"></p>
+
+        <div id="event-deadline-info" class="event-deadline"></div>
+
+        <div id="event-form-container"></div>
+        <p id="event-status-message" class="status-text"></p>
+      </section>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>仁和國中管樂團・回條系統（非官方網站）</p>
+  </footer>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/student.js"></script>
+</body>
+</html>

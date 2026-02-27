@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>仁和管樂回條系統 - 管理端</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>仁和管樂回條系統</h1>
+    <p class="subtitle">管理端・統計與查詢</p>
+  </header>
+
+  <main class="app-main">
+    <!-- 管理員登入區 -->
+    <section id="admin-login-section" class="card">
+      <h2>管理員登入</h2>
+      <form id="admin-login-form" class="form">
+        <label class="form-label">
+          管理員 Token
+          <input type="password" name="adminToken" placeholder="請貼上管理員 token" required />
+        </label>
+        <button type="submit" class="btn primary full-width">登入</button>
+      </form>
+      <p id="admin-login-error" class="error-text hidden"></p>
+    </section>
+
+    <!-- 已登入管理區 -->
+    <section id="admin-section" class="hidden">
+      <div class="card">
+        <div class="student-info">
+          <div>
+            <div class="student-name">管理員模式</div>
+            <div class="student-class muted">可查看回覆統計與各活動詳細內容</div>
+          </div>
+          <button id="admin-logout-btn" class="btn secondary small">登出</button>
+        </div>
+      </div>
+
+      <!-- 活動列表總覽 -->
+      <section class="card">
+        <h2>活動回覆統計</h2>
+        <div id="summary-container"></div>
+        <p id="summary-empty" class="muted hidden">目前尚無活動或名單。</p>
+      </section>
+
+      <!-- 單一活動詳細結果 -->
+      <section id="event-detail-section" class="card hidden">
+        <div class="event-detail-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+          <div>
+            <h2 id="event-detail-title">活動標題</h2>
+            <p id="event-detail-meta" class="muted" style="font-size:0.9rem;"></p>
+          </div>
+          <button id="event-detail-back" class="btn secondary small">返回活動列表</button>
+        </div>
+
+        <div id="event-detail-content" class="muted" style="margin-top:0.75rem; white-space:pre-wrap; font-size:0.92rem;"></div>
+
+        <p id="event-detail-stats" class="muted" style="margin-top:0.5rem; font-size:0.9rem;"></p>
+
+        <!-- 排排站大作戰：篩選 / 排序 -->
+        <div class="event-detail-toolbar">
+          <!-- 第一行：班級 -->
+          <div class="detail-row detail-row-classes">
+            <div id="detail-class-filters" class="detail-pills" aria-label="班級篩選"></div>
+          </div>
+
+          <!-- 第二行：排序（綠色按鈕） -->
+          <div class="detail-row detail-row-sort">
+            <div class="detail-label">排序：</div>
+            <div id="detail-sort-pills" class="detail-pills" aria-label="排序方式"></div>
+          </div>
+
+          <!-- 第三行：右側勾選 -->
+          <div class="detail-row detail-row-right">
+            <div class="detail-right">
+              <label class="detail-toggle">
+                <input type="checkbox" id="detail-show-unreplied" />
+                <span>同時顯示未回覆名單</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+<div class="table-wrapper" style="margin-top:1rem; overflow-x:auto;">
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>班級</th>
+                <th>樂器</th>
+                <th>結果</th>
+                <th>去程遊覽車</th>
+                <th>回程遊覽車</th>
+                <th>簽名</th>
+                <th>備註</th>
+              </tr>
+            </thead>
+            <tbody id="event-detail-tbody">
+              <tr><td colspan="8" class="muted">尚未選擇活動。</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 下半部：未回覆名單（預設隱藏） -->
+        <div id="event-detail-unreplied" class="table-wrapper hidden" style="margin-top:1rem; overflow-x:auto;">
+          <h3 style="margin:0 0 0.4rem; font-size:0.95rem; color:#6b7280;">未回覆名單</h3>
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>班級</th>
+                <th>樂器</th>
+              </tr>
+            </thead>
+            <tbody id="event-detail-unreplied-tbody">
+              <tr><td colspan="3" class="muted">尚未選擇活動。</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 簽名顯示區 -->
+        <div id="signature-viewer" class="hidden" style="margin-top:1.5rem;">
+          <h3 style="margin-bottom:0.25rem;">家長簽名</h3>
+          <p id="signature-viewer-info" class="muted" style="font-size:0.9rem; margin-bottom:0.5rem;"></p>
+          <div style="border:1px solid #ddd; border-radius:4px; padding:0.5rem; background:#fafafa;">
+            <img id="signature-viewer-image" alt="家長簽名" style="width:400px; max-width:100%; height:auto; display:block; margin:0 auto;" />
+          </div>
+        </div>
+
+      </section>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>仁和國中管樂團・回條系統（管理端）</p>
+  </footer>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
